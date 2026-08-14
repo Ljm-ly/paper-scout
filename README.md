@@ -10,7 +10,7 @@
 - **在线阅读** - 内置 PDF 阅读器，直接在浏览器中阅读论文全文
 - **关联推荐** - 基于 Semantic Scholar 的引用关系，自动推荐相关论文、展示引用和被引文献
 - **收藏夹 + 笔记** - 收藏感兴趣的论文，添加阅读笔记和标签分类
-- **AI 摘要翻译** - 集成 OpenAI API，一键翻译论文标题和摘要为中文
+- **AI 摘要翻译** - 集成 DeepSeek API，一键翻译论文标题和摘要为中文
 - **智能筛选** - 按来源、年份、引用数等条件筛选搜索结果
 - **数据安全** - 所有数据保存在浏览器本地，不上传任何服务器
 
@@ -62,10 +62,10 @@ npm run build
 
 ### AI 翻译
 
-翻译功能需要 OpenAI API Key：
-1. 前往 [OpenAI Platform](https://platform.openai.com/api-keys) 获取 API Key
+翻译功能需要 DeepSeek API Key：
+1. 前往 [DeepSeek Platform](https://platform.deepseek.com/api_keys) 获取 API Key
 2. 在 PaperScout 的「设置」页面填入 Key
-3. 选择模型（推荐 GPT-4o Mini，便宜快速）
+3. 选择模型（推荐 DeepSeek Chat，快速便宜）
 
 ## 项目结构
 

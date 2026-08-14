@@ -40,14 +40,14 @@ export type TabType = 'search' | 'favorites' | 'settings'
 
 export interface Settings {
   corsProxy: string
-  openaiKey: string
-  openaiModel: string
+  apiKey: string
+  model: string
   translateEnabled: boolean
 }
 
 export const DEFAULT_SETTINGS: Settings = {
   corsProxy: 'https://corsproxy.io/?',
-  openaiKey: '',
-  openaiModel: 'gpt-4o-mini',
+  apiKey: '',
+  model: 'deepseek-chat',
   translateEnabled: true,
 }

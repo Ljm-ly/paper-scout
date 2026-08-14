@@ -1,19 +1,21 @@
 import { Settings } from '../types'
 
+const DEEPSEEK_API = 'https://api.deepseek.com/v1/chat/completions'
+
 export async function translateText(text: string, settings: Settings): Promise<string> {
-  if (!settings.openaiKey) {
-    return '[请设置 OpenAI API Key]'
+  if (!settings.apiKey) {
+    return '[请设置 DeepSeek API Key]'
   }
 
   try {
-    const res = await fetch('https://api.openai.com/v1/chat/completions', {
+    const res = await fetch(DEEPSEEK_API, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${settings.openaiKey}`,
+        'Authorization': `Bearer ${settings.apiKey}`,
       },
       body: JSON.stringify({
-        model: settings.openaiModel || 'gpt-4o-mini',
+        model: settings.model || 'deepseek-chat',
         messages: [
           {
             role: 'system',
@@ -39,17 +41,17 @@ export async function translateText(text: string, settings: Settings): Promise<s
 }
 
 export async function generateRelatedKeywords(query: string, settings: Settings): Promise<string[]> {
-  if (!settings.openaiKey) return []
+  if (!settings.apiKey) return []
 
   try {
-    const res = await fetch('https://api.openai.com/v1/chat/completions', {
+    const res = await fetch(DEEPSEEK_API, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${settings.openaiKey}`,
+        'Authorization': `Bearer ${settings.apiKey}`,
       },
       body: JSON.stringify({
-        model: settings.openaiModel || 'gpt-4o-mini',
+        model: settings.model || 'deepseek-chat',
         messages: [
           {
             role: 'system',

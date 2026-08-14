@@ -39,16 +39,16 @@ export default function SettingsPanel() {
           </p>
         </div>
 
-        {/* OpenAI API Key */}
+        {/* DeepSeek API Key */}
         <div>
           <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
-            <Key className="w-4 h-4" /> OpenAI API Key
+            <Key className="w-4 h-4" /> DeepSeek API Key
           </label>
           <div className="relative">
             <input
               type={showKey ? 'text' : 'password'}
-              value={form.openaiKey}
-              onChange={e => setForm({ ...form, openaiKey: e.target.value })}
+              value={form.apiKey}
+              onChange={e => setForm({ ...form, apiKey: e.target.value })}
               placeholder="sk-..."
               className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm outline-none focus:border-primary-400 focus:ring-1 focus:ring-primary-400 pr-10"
             />
@@ -61,7 +61,7 @@ export default function SettingsPanel() {
             </button>
           </div>
           <p className="text-xs text-gray-500 mt-1">
-            用于 AI 翻译和关联推荐功能。密钥仅保存在本地浏览器中。
+            前往 <a href="https://platform.deepseek.com/api_keys" target="_blank" rel="noopener noreferrer" className="text-primary-600 hover:underline">platform.deepseek.com</a> 获取 API Key。密钥仅保存在本地浏览器中。
           </p>
         </div>
 
@@ -71,14 +71,12 @@ export default function SettingsPanel() {
             <Languages className="w-4 h-4" /> AI 模型
           </label>
           <select
-            value={form.openaiModel}
-            onChange={e => setForm({ ...form, openaiModel: e.target.value })}
+            value={form.model}
+            onChange={e => setForm({ ...form, model: e.target.value })}
             className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm outline-none focus:border-primary-400 bg-white"
           >
-            <option value="gpt-4o-mini">GPT-4o Mini（推荐，便宜快速）</option>
-            <option value="gpt-4o">GPT-4o</option>
-            <option value="gpt-4-turbo">GPT-4 Turbo</option>
-            <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
+            <option value="deepseek-chat">DeepSeek Chat（推荐，快速便宜）</option>
+            <option value="deepseek-reasoner">DeepSeek Reasoner（深度推理，更慢更贵）</option>
           </select>
         </div>
 
@@ -125,7 +123,7 @@ export default function SettingsPanel() {
           <p className="font-medium mb-1">关于数据安全</p>
           <p className="text-blue-700 text-xs leading-relaxed">
             所有数据（收藏、笔记、设置）仅保存在你的浏览器本地存储中，不会上传到任何服务器。
-            OpenAI API Key 也仅保存在本地，直接发送给 OpenAI 进行翻译。
+            DeepSeek API Key 也仅保存在本地，直接发送给 DeepSeek 进行翻译。
           </p>
         </div>
       </div>
