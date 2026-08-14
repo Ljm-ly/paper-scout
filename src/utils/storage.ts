@@ -15,23 +15,36 @@ export function saveSettings(settings: Settings) {
   localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings))
 }
 
-export function proxyUrl(url: string, settings: Settings): string {
-  if (!settings.corsProxy) return url
-  return settings.corsProxy + encodeURIComponent(url)
-}
+// Multiple CORS proxy options for fallback
+const CORS_PROXIES = [
+  (url: string) => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+  (url: string) => `https://corsproxy.io/?${encodeURIComponent(url)}`,
+  (url: string) => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`,
+]
 
 export async function fetchWithProxy(url: string, settings: Settings, options?: RequestInit): Promise<Response> {
-  // Try direct first
+  // Try direct first (works for APIs with CORS headers)
   try {
     const res = await fetch(url, options)
     if (res.ok) return res
-  } catch { /* fallback to proxy */ }
-
-  // Try with proxy
-  if (settings.corsProxy) {
-    const proxied = proxyUrl(url, settings)
-    return fetch(proxied, options)
+  } catch {
+    // Direct failed, will try proxies
   }
 
-  throw new Error(`无法访问: ${url}`)
+  // Try each proxy in order
+  const proxies = settings.corsProxy
+    ? [(url: string) => `${settings.corsProxy}${encodeURIComponent(url)}`]
+    : CORS_PROXIES
+
+  for (const proxyFn of proxies) {
+    try {
+      const proxiedUrl = proxyFn(url)
+      const res = await fetch(proxiedUrl, options)
+      if (res.ok) return res
+    } catch {
+      continue
+    }
+  }
+
+  throw new Error(`无法访问: ${url}（直接访问和所有代理均失败）`)
 }

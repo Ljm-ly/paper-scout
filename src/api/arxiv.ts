@@ -3,7 +3,7 @@ import { Paper, SearchResult } from '../types'
 import { fetchWithProxy } from '../utils/storage'
 import type { Settings } from '../types'
 
-const ARXIV_API = 'http://export.arxiv.org/api/query'
+const ARXIV_API = 'https://export.arxiv.org/api/query'
 
 const parser = new XMLParser({
   ignoreAttributes: false,

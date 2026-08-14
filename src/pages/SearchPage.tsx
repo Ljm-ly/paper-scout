@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react'
-import { Loader2, AlertCircle, ChevronDown, Filter, Sparkles } from 'lucide-react'
+import { Loader2, AlertCircle, ChevronDown, Filter, Sparkles, CheckCircle2, XCircle } from 'lucide-react'
 import { Paper, SearchFilters } from '../types'
 import { useApp } from '../context/AppContext'
 import { searchArxiv } from '../api/arxiv'
@@ -13,6 +13,15 @@ import SearchBar from '../components/SearchBar'
 import PaperCard from '../components/PaperCard'
 import PaperDetail from '../components/PaperDetail'
 
+const SOURCE_NAMES: Record<string, string> = {
+  semantic_scholar: 'Semantic Scholar',
+  arxiv: 'arXiv',
+  openalex: 'OpenAlex',
+  crossref: 'CrossRef',
+  xmol: 'X-Mol',
+  pubmed: 'PubMed',
+}
+
 export default function SearchPage() {
   const { settings } = useApp()
   const [papers, setPapers] = useState<Paper[]>([])
@@ -24,6 +33,7 @@ export default function SearchPage() {
   const [totalResults, setTotalResults] = useState(0)
   const [showFilters, setShowFilters] = useState(false)
   const [sortByRelevance, setSortByRelevance] = useState(false)
+  const [sourceStatus, setSourceStatus] = useState<Record<string, 'success' | 'error'>>({})
   const [filters, setFilters] = useState<SearchFilters>({
     yearFrom: null,
     yearTo: null,
@@ -40,25 +50,34 @@ export default function SearchPage() {
     setSortByRelevance(false)
 
     try {
-      // Search all 6 sources in parallel
-      const results = await Promise.allSettled([
+      const sourceKeys = ['semantic_scholar', 'arxiv', 'openalex', 'crossref', 'xmol', 'pubmed'] as const
+      const searchFns = [
         searchSemanticScholar(query, 0, 20, settings),
         searchArxiv(query, 0, 20, settings),
         searchOpenAlex(query, 1, 20, settings),
         searchCrossref(query, 0, 20, settings),
         searchXMol(query, 0, settings),
         searchPubMed(query, 0, 20, settings),
-      ])
+      ]
 
+      const results = await Promise.allSettled(searchFns)
+      const status: Record<string, 'success' | 'error'> = {}
       const allPapers: Paper[] = []
       let total = 0
 
-      for (const result of results) {
+      results.forEach((result, i) => {
+        const key = sourceKeys[i]
         if (result.status === 'fulfilled') {
+          status[key] = 'success'
           allPapers.push(...result.value.papers)
           total += result.value.total
+        } else {
+          status[key] = 'error'
+          console.warn(`${key} search failed:`, result.reason)
         }
-      }
+      })
+
+      setSourceStatus(status)
 
       // Deduplicate by title similarity
       const seen = new Set<string>()
@@ -176,6 +195,31 @@ export default function SearchPage() {
               </div>
             </div>
           )}
+        </div>
+      )}
+
+      {/* Source status indicators */}
+      {currentQuery && !loading && Object.keys(sourceStatus).length > 0 && (
+        <div className="max-w-3xl mx-auto mt-4 mb-2">
+          <div className="flex items-center justify-center gap-2 flex-wrap">
+            {Object.entries(sourceStatus).map(([key, status]) => (
+              <span
+                key={key}
+                className={`flex items-center gap-1 text-xs px-2 py-0.5 rounded-full ${
+                  status === 'success'
+                    ? 'bg-green-50 text-green-700'
+                    : 'bg-red-50 text-red-600'
+                }`}
+              >
+                {status === 'success' ? (
+                  <CheckCircle2 className="w-3 h-3" />
+                ) : (
+                  <XCircle className="w-3 h-3" />
+                )}
+                {SOURCE_NAMES[key] || key}
+              </span>
+            ))}
+          </div>
         </div>
       )}
 
