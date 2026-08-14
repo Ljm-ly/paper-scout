@@ -1,11 +1,14 @@
 import React, { useState, useCallback } from 'react'
-import { Loader2, AlertCircle, ChevronDown, Filter } from 'lucide-react'
+import { Loader2, AlertCircle, ChevronDown, Filter, Sparkles } from 'lucide-react'
 import { Paper, SearchFilters } from '../types'
 import { useApp } from '../context/AppContext'
 import { searchArxiv } from '../api/arxiv'
 import { searchSemanticScholar } from '../api/semanticScholar'
 import { searchOpenAlex } from '../api/openalex'
 import { searchCrossref } from '../api/crossref'
+import { searchXMol } from '../api/xmol'
+import { searchPubMed } from '../api/pubmed'
+import { scoreRelevance } from '../utils/aiScore'
 import SearchBar from '../components/SearchBar'
 import PaperCard from '../components/PaperCard'
 import PaperDetail from '../components/PaperDetail'
@@ -14,11 +17,13 @@ export default function SearchPage() {
   const { settings } = useApp()
   const [papers, setPapers] = useState<Paper[]>([])
   const [loading, setLoading] = useState(false)
+  const [scoring, setScoring] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [selectedPaper, setSelectedPaper] = useState<Paper | null>(null)
   const [currentQuery, setCurrentQuery] = useState('')
   const [totalResults, setTotalResults] = useState(0)
   const [showFilters, setShowFilters] = useState(false)
+  const [sortByRelevance, setSortByRelevance] = useState(false)
   const [filters, setFilters] = useState<SearchFilters>({
     yearFrom: null,
     yearTo: null,
@@ -32,14 +37,17 @@ export default function SearchPage() {
     setCurrentQuery(query)
     setPapers([])
     setTotalResults(0)
+    setSortByRelevance(false)
 
     try {
-      // Search all 4 sources in parallel
+      // Search all 6 sources in parallel
       const results = await Promise.allSettled([
         searchSemanticScholar(query, 0, 20, settings),
         searchArxiv(query, 0, 20, settings),
         searchOpenAlex(query, 1, 20, settings),
         searchCrossref(query, 0, 20, settings),
+        searchXMol(query, 0, settings),
+        searchPubMed(query, 0, 20, settings),
       ])
 
       const allPapers: Paper[] = []
@@ -66,6 +74,25 @@ export default function SearchPage() {
 
       setPapers(unique)
       setTotalResults(total)
+
+      // AI relevance scoring
+      if (settings.aiSearchEnabled && settings.apiKey) {
+        setScoring(true)
+        try {
+          const scores = await scoreRelevance(query, unique, settings)
+          const scored = unique.map(p => ({
+            ...p,
+            relevanceScore: scores.get(p.id) || 0,
+          }))
+          scored.sort((a, b) => (b.relevanceScore || 0) - (a.relevanceScore || 0))
+          setPapers(scored)
+          setSortByRelevance(true)
+        } catch (e) {
+          console.error('AI scoring failed:', e)
+        } finally {
+          setScoring(false)
+        }
+      }
     } catch (e: any) {
       setError(e.message || '搜索失败')
     } finally {
@@ -113,6 +140,8 @@ export default function SearchPage() {
                   <option value="arxiv">arXiv</option>
                   <option value="openalex">OpenAlex</option>
                   <option value="crossref">CrossRef</option>
+                  <option value="xmol">X-Mol</option>
+                  <option value="pubmed">PubMed</option>
                 </select>
               </div>
 
@@ -153,10 +182,17 @@ export default function SearchPage() {
       {/* Results info */}
       {currentQuery && !loading && (
         <div className="max-w-3xl mx-auto mt-4 mb-2">
-          <p className="text-sm text-gray-500 text-center">
-            找到 <span className="font-medium text-gray-700">{filteredPapers.length}</span> 篇相关论文
-            {totalResults > 0 && <span className="text-gray-400"> (总计约 {totalResults.toLocaleString()} 篇)</span>}
-          </p>
+          <div className="flex items-center justify-center gap-3 flex-wrap">
+            <p className="text-sm text-gray-500">
+              找到 <span className="font-medium text-gray-700">{filteredPapers.length}</span> 篇相关论文
+              {totalResults > 0 && <span className="text-gray-400"> (总计约 {totalResults.toLocaleString()} 篇)</span>}
+            </p>
+            {sortByRelevance && (
+              <span className="flex items-center gap-1 text-xs text-primary-600 bg-primary-50 px-2 py-1 rounded-full">
+                <Sparkles className="w-3 h-3" /> AI 相关度排序
+              </span>
+            )}
+          </div>
         </div>
       )}
 
@@ -165,7 +201,16 @@ export default function SearchPage() {
         <div className="flex flex-col items-center justify-center py-16">
           <Loader2 className="w-8 h-8 animate-spin text-primary-500 mb-3" />
           <p className="text-gray-500">正在从多个数据库搜索论文...</p>
-          <p className="text-xs text-gray-400 mt-1">arXiv / Semantic Scholar / OpenAlex / CrossRef</p>
+          <p className="text-xs text-gray-400 mt-1">arXiv / Semantic Scholar / OpenAlex / CrossRef / X-Mol / PubMed</p>
+        </div>
+      )}
+
+      {/* AI Scoring */}
+      {scoring && (
+        <div className="flex flex-col items-center justify-center py-8">
+          <Sparkles className="w-6 h-6 animate-pulse text-primary-500 mb-2" />
+          <p className="text-sm text-gray-600">AI 正在评估论文相关度...</p>
+          <p className="text-xs text-gray-400 mt-1">使用 DeepSeek 分析每篇论文与搜索主题的相关性</p>
         </div>
       )}
 

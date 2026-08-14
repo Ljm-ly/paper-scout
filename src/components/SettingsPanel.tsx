@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Settings, Save, Eye, EyeOff, Key, Globe, Languages } from 'lucide-react'
+import { Settings, Save, Eye, EyeOff, Key, Globe, Languages, Sparkles } from 'lucide-react'
 import { useApp } from '../context/AppContext'
 
 export default function SettingsPanel() {
@@ -100,6 +100,26 @@ export default function SettingsPanel() {
           </button>
         </div>
 
+        {/* AI Search toggle */}
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-sm font-medium text-gray-700">启用 AI 智能搜索</p>
+            <p className="text-xs text-gray-500">使用 AI 评估论文相关度并排序（需要 API Key）</p>
+          </div>
+          <button
+            onClick={() => setForm({ ...form, aiSearchEnabled: !form.aiSearchEnabled })}
+            className={`relative w-12 h-6 rounded-full transition-colors ${
+              form.aiSearchEnabled ? 'bg-primary-600' : 'bg-gray-300'
+            }`}
+          >
+            <span
+              className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${
+                form.aiSearchEnabled ? 'translate-x-6' : 'translate-x-0.5'
+              }`}
+            />
+          </button>
+        </div>
+
         {/* Save button */}
         <button
           onClick={handleSave}
@@ -123,7 +143,7 @@ export default function SettingsPanel() {
           <p className="font-medium mb-1">关于数据安全</p>
           <p className="text-blue-700 text-xs leading-relaxed">
             所有数据（收藏、笔记、设置）仅保存在你的浏览器本地存储中，不会上传到任何服务器。
-            DeepSeek API Key 也仅保存在本地，直接发送给 DeepSeek 进行翻译。
+            DeepSeek API Key 也仅保存在本地，直接发送给 DeepSeek 进行翻译和 AI 搜索评分。
           </p>
         </div>
       </div>

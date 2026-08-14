@@ -6,7 +6,8 @@
 
 ## 功能特性
 
-- **多源搜索** - 同时从 arXiv、Semantic Scholar、OpenAlex、CrossRef 四大数据库搜索论文
+- **多源搜索** - 同时从 6 大数据库搜索论文（arXiv、Semantic Scholar、OpenAlex、CrossRef、X-Mol、PubMed）
+- **AI 智能搜索** - 使用 DeepSeek AI 评估每篇论文与搜索主题的相关度，智能排序
 - **在线阅读** - 内置 PDF 阅读器，直接在浏览器中阅读论文全文
 - **关联推荐** - 基于 Semantic Scholar 的引用关系，自动推荐相关论文、展示引用和被引文献
 - **收藏夹 + 笔记** - 收藏感兴趣的论文，添加阅读笔记和标签分类
@@ -31,6 +32,8 @@
 | [Semantic Scholar](https://www.semanticscholar.org) | AI 驱动的学术搜索引擎，提供引用关系和推荐 |
 | [OpenAlex](https://openalex.org) | 免费的开放学术数据库，覆盖 2.5 亿+ 学术作品 |
 | [CrossRef](https://www.crossref.org) | 多学科核心期刊数据库，提供 DOI 元数据 |
+| [X-Mol](https://www.x-mol.com) | 化学、材料、生物医药领域论文平台，含影响因子信息 |
+| [PubMed](https://pubmed.ncbi.nlm.nih.gov) | 生物医学领域权威数据库，覆盖生命科学和医学研究 |
 
 ## 快速开始
 
@@ -60,12 +63,18 @@ npm run build
 
 由于浏览器安全限制，从 GitHub Pages 访问某些 API 需要 CORS 代理。默认使用 [corsproxy.io](https://corsproxy.io)，你可以在设置中修改。
 
-### AI 翻译
+### AI 功能
 
-翻译功能需要 DeepSeek API Key：
+PaperScout 集成 DeepSeek AI 提供两项智能功能：
+
+1. **AI 摘要翻译** - 一键翻译论文标题和摘要为中文
+2. **AI 智能搜索** - 自动评估每篇论文与搜索主题的相关度（0-100分），按相关度排序
+
+启用方法：
 1. 前往 [DeepSeek Platform](https://platform.deepseek.com/api_keys) 获取 API Key
 2. 在 PaperScout 的「设置」页面填入 Key
 3. 选择模型（推荐 DeepSeek Chat，快速便宜）
+4. 开启「启用 AI 智能搜索」开关
 
 ## 项目结构
 
@@ -78,7 +87,9 @@ paper-scout/
 │   │   ├── arxiv.ts      # arXiv API
 │   │   ├── semanticScholar.ts  # Semantic Scholar API
 │   │   ├── openalex.ts   # OpenAlex API
-│   │   └── crossref.ts   # CrossRef API
+│   │   ├── crossref.ts   # CrossRef API
+│   │   ├── xmol.ts       # X-Mol API（HTML 抓取）
+│   │   └── pubmed.ts     # PubMed API
 │   ├── components/       # UI 组件
 │   │   ├── SearchBar.tsx
 │   │   ├── PaperCard.tsx
@@ -89,6 +100,9 @@ paper-scout/
 │   ├── pages/            # 页面组件
 │   ├── types/            # TypeScript 类型定义
 │   ├── utils/            # 工具函数
+│   │   ├── storage.ts    # 本地存储和代理
+│   │   ├── translate.ts  # AI 翻译功能
+│   │   └── aiScore.ts    # AI 相关度评分
 │   ├── App.tsx           # 主应用组件
 │   ├── main.tsx          # 入口文件
 │   └── index.css         # 全局样式

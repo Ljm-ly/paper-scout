@@ -13,6 +13,8 @@ const SOURCE_LABELS: Record<string, string> = {
   semantic_scholar: 'S2',
   openalex: 'OpenAlex',
   crossref: 'CrossRef',
+  xmol: 'X-Mol',
+  pubmed: 'PubMed',
 }
 
 const SOURCE_COLORS: Record<string, string> = {
@@ -20,6 +22,8 @@ const SOURCE_COLORS: Record<string, string> = {
   semantic_scholar: 'bg-blue-100 text-blue-700',
   openalex: 'bg-green-100 text-green-700',
   crossref: 'bg-purple-100 text-purple-700',
+  xmol: 'bg-orange-100 text-orange-700',
+  pubmed: 'bg-teal-100 text-teal-700',
 }
 
 export default function PaperCard({ paper, onSelect }: PaperCardProps) {
@@ -63,6 +67,30 @@ export default function PaperCard({ paper, onSelect }: PaperCardProps) {
       <p className="text-sm text-gray-500 mb-3 line-clamp-3 leading-relaxed">
         {paper.abstract || '暂无摘要'}
       </p>
+
+      {/* Relevance Score */}
+      {paper.relevanceScore !== undefined && (
+        <div className="mb-2">
+          <div className="flex items-center justify-between mb-1">
+            <span className="text-xs font-medium text-gray-600">AI 相关度</span>
+            <span className={`text-xs font-bold ${
+              paper.relevanceScore >= 80 ? 'text-green-600' :
+              paper.relevanceScore >= 60 ? 'text-blue-600' :
+              paper.relevanceScore >= 40 ? 'text-yellow-600' : 'text-gray-500'
+            }`}>{paper.relevanceScore}%</span>
+          </div>
+          <div className="w-full bg-gray-100 rounded-full h-1.5">
+            <div
+              className={`h-1.5 rounded-full transition-all ${
+                paper.relevanceScore >= 80 ? 'bg-green-500' :
+                paper.relevanceScore >= 60 ? 'bg-blue-500' :
+                paper.relevanceScore >= 40 ? 'bg-yellow-500' : 'bg-gray-400'
+              }`}
+              style={{ width: `${paper.relevanceScore}%` }}
+            />
+          </div>
+        </div>
+      )}
 
       {/* Meta */}
       <div className="flex items-center flex-wrap gap-2 text-xs">

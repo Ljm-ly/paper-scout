@@ -9,11 +9,12 @@ export interface Paper {
   pdfUrl: string | null
   doi: string | null
   citationCount: number
-  source: 'arxiv' | 'semantic_scholar' | 'openalex' | 'crossref'
+  source: 'arxiv' | 'semantic_scholar' | 'openalex' | 'crossref' | 'xmol' | 'pubmed'
   sourceId: string
   categories: string[]
   translatedTitle?: string
   translatedAbstract?: string
+  relevanceScore?: number
 }
 
 export interface SearchFilters {
@@ -43,6 +44,7 @@ export interface Settings {
   apiKey: string
   model: string
   translateEnabled: boolean
+  aiSearchEnabled: boolean
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -50,4 +52,5 @@ export const DEFAULT_SETTINGS: Settings = {
   apiKey: '',
   model: 'deepseek-chat',
   translateEnabled: true,
+  aiSearchEnabled: false,
 }
