@@ -6,8 +6,8 @@ import { searchArxiv } from '../api/arxiv'
 import { searchSemanticScholar } from '../api/semanticScholar'
 import { searchOpenAlex } from '../api/openalex'
 import { searchCrossref } from '../api/crossref'
-import { searchXMol } from '../api/xmol'
-import { searchPubMed } from '../api/pubmed'
+import { searchChemRxiv } from '../api/chemrxiv'
+import { searchEuropePMC } from '../api/europePmc'
 import { scoreRelevance } from '../utils/aiScore'
 import SearchBar from '../components/SearchBar'
 import PaperCard from '../components/PaperCard'
@@ -18,8 +18,8 @@ const SOURCE_NAMES: Record<string, string> = {
   arxiv: 'arXiv',
   openalex: 'OpenAlex',
   crossref: 'CrossRef',
-  xmol: 'X-Mol',
-  pubmed: 'PubMed',
+  chemrxiv: 'ChemRxiv',
+  europe_pmc: 'Europe PMC',
 }
 
 export default function SearchPage() {
@@ -50,14 +50,14 @@ export default function SearchPage() {
     setSortByRelevance(false)
 
     try {
-      const sourceKeys = ['semantic_scholar', 'arxiv', 'openalex', 'crossref', 'xmol', 'pubmed'] as const
+      const sourceKeys = ['semantic_scholar', 'arxiv', 'openalex', 'crossref', 'chemrxiv', 'europe_pmc'] as const
       const searchFns = [
         searchSemanticScholar(query, 0, 20, settings),
         searchArxiv(query, 0, 20, settings),
         searchOpenAlex(query, 1, 20, settings),
         searchCrossref(query, 0, 20, settings),
-        searchXMol(query, 0, settings),
-        searchPubMed(query, 0, 20, settings),
+        searchChemRxiv(query, 0, 20, settings),
+        searchEuropePMC(query, 1, 20, settings),
       ]
 
       const results = await Promise.allSettled(searchFns)
@@ -159,8 +159,8 @@ export default function SearchPage() {
                   <option value="arxiv">arXiv</option>
                   <option value="openalex">OpenAlex</option>
                   <option value="crossref">CrossRef</option>
-                  <option value="xmol">X-Mol</option>
-                  <option value="pubmed">PubMed</option>
+                  <option value="chemrxiv">ChemRxiv</option>
+                  <option value="europe_pmc">Europe PMC</option>
                 </select>
               </div>
 
@@ -245,7 +245,7 @@ export default function SearchPage() {
         <div className="flex flex-col items-center justify-center py-16">
           <Loader2 className="w-8 h-8 animate-spin text-primary-500 mb-3" />
           <p className="text-gray-500">正在从多个数据库搜索论文...</p>
-          <p className="text-xs text-gray-400 mt-1">arXiv / Semantic Scholar / OpenAlex / CrossRef / X-Mol / PubMed</p>
+          <p className="text-xs text-gray-400 mt-1">arXiv / Semantic Scholar / OpenAlex / CrossRef / ChemRxiv / Europe PMC</p>
         </div>
       )}
 

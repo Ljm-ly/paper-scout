@@ -13,8 +13,8 @@ const SOURCE_LABELS: Record<string, string> = {
   semantic_scholar: 'S2',
   openalex: 'OpenAlex',
   crossref: 'CrossRef',
-  xmol: 'X-Mol',
-  pubmed: 'PubMed',
+  chemrxiv: 'ChemRxiv',
+  europe_pmc: 'Europe PMC',
 }
 
 const SOURCE_COLORS: Record<string, string> = {
@@ -22,8 +22,8 @@ const SOURCE_COLORS: Record<string, string> = {
   semantic_scholar: 'bg-blue-100 text-blue-700',
   openalex: 'bg-green-100 text-green-700',
   crossref: 'bg-purple-100 text-purple-700',
-  xmol: 'bg-orange-100 text-orange-700',
-  pubmed: 'bg-teal-100 text-teal-700',
+  chemrxiv: 'bg-orange-100 text-orange-700',
+  europe_pmc: 'bg-teal-100 text-teal-700',
 }
 
 export default function PaperCard({ paper, onSelect }: PaperCardProps) {
