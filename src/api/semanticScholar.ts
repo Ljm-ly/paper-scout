@@ -40,17 +40,36 @@ export async function searchSemanticScholar(
   })
 
   const url = `${S2_API}/paper/search?${params}`
-  const res = await fetchWithProxy(url, settings)
-  const data = await res.json()
+  
+  // Retry up to 2 times with delay (S2 has rate limits)
+  let lastError: Error | null = null
+  for (let attempt = 0; attempt < 2; attempt++) {
+    try {
+      if (attempt > 0) {
+        await new Promise(r => setTimeout(r, 1000 * attempt))
+      }
+      const res = await fetchWithProxy(url, settings)
+      
+      if (res.status === 429) {
+        lastError = new Error('Semantic Scholar rate limited')
+        continue
+      }
+      
+      const data = await res.json()
+      const papers = (data.data || []).map(parseS2Paper)
+      const total = data.total || papers.length
 
-  const papers = (data.data || []).map(parseS2Paper)
-  const total = data.total || papers.length
-
-  return {
-    papers,
-    total,
-    nextCursor: offset + limit < total ? String(offset + limit) : null,
+      return {
+        papers,
+        total,
+        nextCursor: offset + limit < total ? String(offset + limit) : null,
+      }
+    } catch (e: any) {
+      lastError = e
+    }
   }
+  
+  throw lastError || new Error('Semantic Scholar search failed')
 }
 
 export async function getRelatedPapers(

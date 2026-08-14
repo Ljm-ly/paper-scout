@@ -37,7 +37,7 @@ function parseOpenAlexWork(item: any): Paper {
     authors,
     abstract,
     year,
-    venue: item.primary_location?.source?.display_name || item.journal?.display_name || '',
+    venue: item.primary_location?.source?.display_name || '',
     url: bestUrl,
     pdfUrl,
     doi,
@@ -58,9 +58,8 @@ export async function searchOpenAlex(
     search: query,
     'page': String(page),
     'per-page': String(perPage),
-    'sort': 'relevance_score:desc',
     'mailto': 'paper-scout-user@example.com',
-    select: 'id,doi,title,display_name,publication_year,authorships,primary_location,journal,abstract_inverted_index,cited_by_count,concepts,open_access',
+    select: 'id,doi,title,display_name,publication_year,authorships,primary_location,abstract_inverted_index,cited_by_count,concepts,open_access',
   })
 
   const url = `${OPENALEX_API}?${params}`
