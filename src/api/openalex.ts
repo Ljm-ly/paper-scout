@@ -15,7 +15,7 @@ function parseOpenAlexWork(item: any): Paper {
   // Extract concepts as categories
   const categories = (item.concepts || []).map((c: any) => c.display_name || '').filter(Boolean)
 
-  // Reconstruct abstract from inverted index
+  // Reconstruct abstract from inverted index (if available)
   let abstract = ''
   if (item.abstract_inverted_index) {
     const words: [number, string][] = []
@@ -51,7 +51,7 @@ function parseOpenAlexWork(item: any): Paper {
 export async function searchOpenAlex(
   query: string,
   page: number = 1,
-  perPage: number = 20,
+  perPage: number = 10,
   settings: Settings
 ): Promise<SearchResult> {
   const params = new URLSearchParams({
@@ -59,7 +59,7 @@ export async function searchOpenAlex(
     'page': String(page),
     'per-page': String(perPage),
     'mailto': 'paper-scout-user@example.com',
-    select: 'id,doi,title,display_name,publication_year,authorships,primary_location,abstract_inverted_index,cited_by_count,concepts,open_access',
+    select: 'id,doi,title,display_name,publication_year,authorships,primary_location,cited_by_count,concepts,open_access',
   })
 
   const url = `${OPENALEX_API}?${params}`

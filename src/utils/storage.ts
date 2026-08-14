@@ -23,9 +23,14 @@ const CORS_PROXIES = [
 ]
 
 export async function fetchWithProxy(url: string, settings: Settings, options?: RequestInit): Promise<Response> {
+  const timeout = 15000 // 15 second timeout
+
   // Try direct first (works for APIs with CORS headers)
   try {
-    const res = await fetch(url, options)
+    const controller = new AbortController()
+    const timer = setTimeout(() => controller.abort(), timeout)
+    const res = await fetch(url, { ...options, signal: controller.signal })
+    clearTimeout(timer)
     if (res.ok) return res
   } catch {
     // Direct failed, will try proxies
@@ -38,8 +43,11 @@ export async function fetchWithProxy(url: string, settings: Settings, options?: 
 
   for (const proxyFn of proxies) {
     try {
+      const controller = new AbortController()
+      const timer = setTimeout(() => controller.abort(), timeout)
       const proxiedUrl = proxyFn(url)
-      const res = await fetch(proxiedUrl, options)
+      const res = await fetch(proxiedUrl, { ...options, signal: controller.signal })
+      clearTimeout(timer)
       if (res.ok) return res
     } catch {
       continue
