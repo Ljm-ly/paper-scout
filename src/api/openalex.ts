@@ -15,6 +15,19 @@ function parseOpenAlexWork(item: any): Paper {
   // Extract concepts as categories
   const categories = (item.concepts || []).map((c: any) => c.display_name || '').filter(Boolean)
 
+  // Reconstruct abstract from inverted index
+  let abstract = ''
+  if (item.abstract_inverted_index) {
+    const words: [number, string][] = []
+    for (const [word, positions] of Object.entries(item.abstract_inverted_index)) {
+      for (const pos of positions as number[]) {
+        words.push([pos, word])
+      }
+    }
+    words.sort((a, b) => a[0] - b[0])
+    abstract = words.map(w => w[1]).join(' ')
+  }
+
   // Build best OA location URL
   const bestUrl = item.doi || item.id || ''
 
@@ -22,7 +35,7 @@ function parseOpenAlexWork(item: any): Paper {
     id: `oa:${item.id?.replace('https://openalex.org/', '') || ''}`,
     title: item.display_name || item.title || '',
     authors,
-    abstract: item.abstract || '',
+    abstract,
     year,
     venue: item.primary_location?.source?.display_name || item.journal?.display_name || '',
     url: bestUrl,
@@ -46,7 +59,8 @@ export async function searchOpenAlex(
     'page': String(page),
     'per-page': String(perPage),
     'sort': 'relevance_score:desc',
-    select: 'id,doi,title,display_name,publication_year,authorships,primary_location,journal,abstract,cited_by_count,concepts,open_access',
+    'mailto': 'paper-scout-user@example.com',
+    select: 'id,doi,title,display_name,publication_year,authorships,primary_location,journal,abstract_inverted_index,cited_by_count,concepts,open_access',
   })
 
   const url = `${OPENALEX_API}?${params}`

@@ -9,7 +9,7 @@ export interface Paper {
   pdfUrl: string | null
   doi: string | null
   citationCount: number
-  source: 'arxiv' | 'semantic_scholar' | 'openalex' | 'crossref' | 'chemrxiv' | 'europe_pmc'
+  source: 'arxiv' | 'semantic_scholar' | 'openalex' | 'crossref' | 'biorxiv' | 'europe_pmc' | 'core'
   sourceId: string
   categories: string[]
   translatedTitle?: string
