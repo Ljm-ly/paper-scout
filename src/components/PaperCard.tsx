@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { memo } from 'react'
 import { BookOpen, Quote, ExternalLink, Star, FileText, Calendar, Tag } from 'lucide-react'
 import { Paper } from '../types'
 import { useApp } from '../context/AppContext'
@@ -28,7 +28,7 @@ const SOURCE_COLORS: Record<string, string> = {
   core: 'bg-indigo-100 text-indigo-700',
 }
 
-export default function PaperCard({ paper, onSelect }: PaperCardProps) {
+function PaperCard({ paper, onSelect }: PaperCardProps) {
   const { isFavorite, addFavorite, removeFavorite } = useApp()
   const fav = isFavorite(paper.id)
 
@@ -127,3 +127,5 @@ export default function PaperCard({ paper, onSelect }: PaperCardProps) {
     </div>
   )
 }
+
+export default memo(PaperCard)

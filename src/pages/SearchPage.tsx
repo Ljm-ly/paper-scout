@@ -36,6 +36,7 @@ export default function SearchPage() {
   const [showFilters, setShowFilters] = useState(false)
   const [sortByRelevance, setSortByRelevance] = useState(false)
   const [sourceStatus, setSourceStatus] = useState<Record<string, 'success' | 'error'>>({})
+  const [visibleCount, setVisibleCount] = useState(12)
   const [filters, setFilters] = useState<SearchFilters>({
     yearFrom: null,
     yearTo: null,
@@ -50,17 +51,18 @@ export default function SearchPage() {
     setPapers([])
     setTotalResults(0)
     setSortByRelevance(false)
+    setVisibleCount(12)
 
     try {
       const sourceKeys = ['semantic_scholar', 'arxiv', 'openalex', 'crossref', 'biorxiv', 'europe_pmc', 'core'] as const
       const searchFns = [
-        searchSemanticScholar(query, 0, 20, settings),
-        searchArxiv(query, 0, 20, settings),
-        searchOpenAlex(query, 1, 20, settings),
-        searchCrossref(query, 0, 20, settings),
-        searchBioRxiv(query, 0, 20, settings),
-        searchEuropePMC(query, 1, 20, settings),
-        searchCore(query, 1, 20, settings),
+        searchSemanticScholar(query, 0, 10, settings),
+        searchArxiv(query, 0, 10, settings),
+        searchOpenAlex(query, 1, 10, settings),
+        searchCrossref(query, 0, 10, settings),
+        searchBioRxiv(query, 0, 10, settings),
+        searchEuropePMC(query, 1, 10, settings),
+        searchCore(query, 1, 10, settings),
       ]
 
       const results = await Promise.allSettled(searchFns)
@@ -278,13 +280,27 @@ export default function SearchPage() {
         </div>
       )}
 
-      {/* Paper grid */}
+      {/* Paper grid - only show visibleCount items */}
       {!loading && filteredPapers.length > 0 && (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 mt-4">
-          {filteredPapers.map(paper => (
-            <PaperCard key={paper.id} paper={paper} onSelect={setSelectedPaper} />
-          ))}
-        </div>
+        <>
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 mt-4">
+            {filteredPapers.slice(0, visibleCount).map(paper => (
+              <PaperCard key={paper.id} paper={paper} onSelect={setSelectedPaper} />
+            ))}
+          </div>
+
+          {/* Load more button */}
+          {visibleCount < filteredPapers.length && (
+            <div className="text-center mt-6">
+              <button
+                onClick={() => setVisibleCount(prev => prev + 12)}
+                className="px-6 py-2.5 bg-primary-50 text-primary-700 rounded-xl text-sm font-medium hover:bg-primary-100 transition-colors"
+              >
+                加载更多 ({filteredPapers.length - visibleCount} 篇)
+              </button>
+            </div>
+          )}
+        </>
       )}
 
       {/* No results */}
