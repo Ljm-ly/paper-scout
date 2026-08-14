@@ -1,0 +1,104 @@
+# PaperScout - 学术论文搜索阅读工具
+
+一键搜索、阅读、收藏、翻译学术论文的 Web 工具。
+
+![PaperScout](https://img.shields.io/badge/PaperScout-v1.0-blue)
+
+## 功能特性
+
+- **多源搜索** - 同时从 arXiv、Semantic Scholar、OpenAlex、CrossRef 四大数据库搜索论文
+- **在线阅读** - 内置 PDF 阅读器，直接在浏览器中阅读论文全文
+- **关联推荐** - 基于 Semantic Scholar 的引用关系，自动推荐相关论文、展示引用和被引文献
+- **收藏夹 + 笔记** - 收藏感兴趣的论文，添加阅读笔记和标签分类
+- **AI 摘要翻译** - 集成 OpenAI API，一键翻译论文标题和摘要为中文
+- **智能筛选** - 按来源、年份、引用数等条件筛选搜索结果
+- **数据安全** - 所有数据保存在浏览器本地，不上传任何服务器
+
+## 技术栈
+
+- **React 18** + **TypeScript** - 前端框架
+- **Vite** - 构建工具
+- **Tailwind CSS** - 样式框架
+- **Lucide React** - 图标库
+- **fast-xml-parser** - arXiv XML 数据解析
+- **GitHub Pages** - 静态部署
+
+## 数据源
+
+| 数据源 | 说明 |
+|--------|------|
+| [arXiv](https://arxiv.org) | 全球最大的预印本论文库，涵盖物理、数学、计算机、生物等 |
+| [Semantic Scholar](https://www.semanticscholar.org) | AI 驱动的学术搜索引擎，提供引用关系和推荐 |
+| [OpenAlex](https://openalex.org) | 免费的开放学术数据库，覆盖 2.5 亿+ 学术作品 |
+| [CrossRef](https://www.crossref.org) | 多学科核心期刊数据库，提供 DOI 元数据 |
+
+## 快速开始
+
+### 本地开发
+
+```bash
+# 安装依赖
+npm install
+
+# 启动开发服务器
+npm run dev
+
+# 构建生产版本
+npm run build
+```
+
+### 部署到 GitHub Pages
+
+1. Fork 或创建 GitHub 仓库
+2. 在仓库 Settings > Pages 中，将 Source 设置为 **GitHub Actions**
+3. 推送代码到 `main` 分支，自动触发部署
+4. 访问 `https://<你的用户名>.github.io/paper-scout/`
+
+## 设置说明
+
+### CORS 代理
+
+由于浏览器安全限制，从 GitHub Pages 访问某些 API 需要 CORS 代理。默认使用 [corsproxy.io](https://corsproxy.io)，你可以在设置中修改。
+
+### AI 翻译
+
+翻译功能需要 OpenAI API Key：
+1. 前往 [OpenAI Platform](https://platform.openai.com/api-keys) 获取 API Key
+2. 在 PaperScout 的「设置」页面填入 Key
+3. 选择模型（推荐 GPT-4o Mini，便宜快速）
+
+## 项目结构
+
+```
+paper-scout/
+├── .github/workflows/    # GitHub Actions 部署配置
+├── public/               # 静态资源
+├── src/
+│   ├── api/              # 论文 API 服务
+│   │   ├── arxiv.ts      # arXiv API
+│   │   ├── semanticScholar.ts  # Semantic Scholar API
+│   │   ├── openalex.ts   # OpenAlex API
+│   │   └── crossref.ts   # CrossRef API
+│   ├── components/       # UI 组件
+│   │   ├── SearchBar.tsx
+│   │   ├── PaperCard.tsx
+│   │   ├── PaperDetail.tsx
+│   │   ├── FavoritesPanel.tsx
+│   │   └── SettingsPanel.tsx
+│   ├── context/          # React Context 状态管理
+│   ├── pages/            # 页面组件
+│   ├── types/            # TypeScript 类型定义
+│   ├── utils/            # 工具函数
+│   ├── App.tsx           # 主应用组件
+│   ├── main.tsx          # 入口文件
+│   └── index.css         # 全局样式
+├── index.html
+├── package.json
+├── tailwind.config.js
+├── tsconfig.json
+└── vite.config.ts
+```
+
+## License
+
+MIT
