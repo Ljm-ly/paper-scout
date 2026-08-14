@@ -32,6 +32,7 @@ export async function searchSemanticScholar(
   limit: number = 20,
   settings: Settings
 ): Promise<SearchResult> {
+  // Use bulk search endpoint (less restrictive rate limits)
   const params = new URLSearchParams({
     query,
     offset: String(offset),
@@ -39,19 +40,24 @@ export async function searchSemanticScholar(
     fields: FIELDS,
   })
 
-  const url = `${S2_API}/paper/search?${params}`
+  const url = `${S2_API}/paper/search/bulk?${params}`
   
-  // Retry up to 2 times with delay (S2 has rate limits)
+  // Retry up to 3 times with increasing delay (S2 has rate limits)
   let lastError: Error | null = null
-  for (let attempt = 0; attempt < 2; attempt++) {
+  for (let attempt = 0; attempt < 3; attempt++) {
     try {
       if (attempt > 0) {
-        await new Promise(r => setTimeout(r, 1000 * attempt))
+        await new Promise(r => setTimeout(r, 2000 * attempt))
       }
       const res = await fetchWithProxy(url, settings)
       
       if (res.status === 429) {
         lastError = new Error('Semantic Scholar rate limited')
+        continue
+      }
+      
+      if (!res.ok) {
+        lastError = new Error(`Semantic Scholar returned ${res.status}`)
         continue
       }
       
